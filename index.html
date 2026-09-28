@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>GGB Account</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,"Noto Sans Thai",sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+    radial-gradient(circle at 20% 20%,#155c9e,transparent 35%),
+    radial-gradient(circle at 80% 80%,#54218a,transparent 35%),
+    #050810;
+
+    color:white;
+}
+
+.card{
+    width:92%;
+    max-width:430px;
+    padding:32px;
+
+    background:rgba(12,18,35,.92);
+
+    border:1px solid rgba(255,255,255,.12);
+
+    border-radius:28px;
+
+    box-shadow:
+    0 25px 80px rgba(0,0,0,.65);
+}
+
+.logo{
+    width:75px;
+    height:75px;
+
+    margin:0 auto 15px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    border-radius:22px;
+
+    background:
+    linear-gradient(135deg,#00c8ff,#635bff);
+
+    font-size:25px;
+    font-weight:900;
+
+    box-shadow:
+    0 0 35px rgba(0,190,255,.4);
+}
+
+h1{
+    text-align:center;
+    font-size:28px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#9da8c0;
+    margin-top:8px;
+    margin-bottom:25px;
+    font-size:14px;
+}
+
+label{
+    display:block;
+    margin:15px 0 7px;
+    color:#cbd4e8;
+    font-size:14px;
+}
+
+input{
+    width:100%;
+    padding:15px;
+
+    border-radius:13px;
+
+    border:1px solid #303951;
+
+    outline:none;
+
+    background:#080d1b;
+
+    color:white;
+
+    font-size:15px;
+}
+
+input:focus{
+    border-color:#00c8ff;
+}
+
+button{
+    width:100%;
+
+    padding:15px;
+
+    margin-top:20px;
+
+    border:0;
+
+    border-radius:14px;
+
+    background:
+    linear-gradient(135deg,#00bfff,#635bff);
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:
+    0 8px 30px rgba(0,150,255,.25);
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+.message{
+    margin-top:15px;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    background:rgba(0,220,150,.1);
+
+    border:1px solid rgba(0,220,150,.25);
+
+    color:#72f5c5;
+
+    text-align:center;
+
+    font-size:13px;
+
+    display:none;
+}
+
+.message.show{
+    display:block;
+}
+
+.footer{
+    margin-top:22px;
+
+    text-align:center;
+
+    color:#68738d;
+
+    font-size:11px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="logo">
+        GGB
+    </div>
+
+    <h1>
+        GGB Account
+    </h1>
+
+    <div class="subtitle">
+        สมัครบัญชีเพื่อเข้าสู่เว็บหลัก
+    </div>
+
+
+    <label>
+        อีเมล
+    </label>
+
+    <input
+        id="email"
+        type="email"
+        placeholder="example@email.com"
+    >
+
+
+    <label>
+        รหัสผ่าน
+    </label>
+
+    <input
+        id="password"
+        type="password"
+        placeholder="รหัสผ่าน"
+    >
+
+
+    <!-- ปุ่มสีฟ้า -->
+
+    <button onclick="enterGGB()">
+
+        สมัครบัญชีและเข้าสู่ GGB
+
+    </button>
+
+
+    <div
+        id="message"
+        class="message"
+    >
+        กำลังเข้าสู่เว็บ GGB...
+    </div>
+
+
+    <div class="footer">
+
+        GGB Account System
+
+    </div>
+
+</div>
+
+
+<script>
+
+/*
+================================================
+เว็บหลักของคุณ
+================================================
+*/
+
+const GGB_URL =
+"https://ai8639647g-cell.github.io/GGB/?utm_source=chatgpt.com";
+
+
+/*
+================================================
+เมื่อกดปุ่มสีฟ้า
+================================================
+*/
+
+function enterGGB(){
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+
+    /*
+    ตรวจสอบว่ากรอกข้อมูลหรือยัง
+    */
+
+    if(!email){
+
+        alert("กรุณากรอกอีเมลก่อน");
+
+        return;
+
+    }
+
+
+    if(!password){
+
+        alert("กรุณากรอกรหัสผ่านก่อน");
+
+        return;
+
+    }
+
+
+    /*
+    แสดงข้อความ
+    */
+
+    document
+        .getElementById("message")
+        .classList.add("show");
+
+
+    /*
+    ================================================
+    ⭐ เด้งเข้าเว็บ GGB อัตโนมัติ
+    ================================================
+    */
+
+    setTimeout(function(){
+
+        window.location.href = GGB_URL;
+
+    },300);
+
+}
+
+</script>
+
+</body>
+</html>
