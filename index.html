@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสมัครสมาชิกปลอดภัยสูง</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0f19;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            user-select: none; /* ป้องกันการลากคลุมคัดลอก */
+        }
+        .app-container {
+            background-color: #161f32;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid #233554;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4facfe;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #38bdf8;
+            outline: none;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .btn-submit:hover {
+            background-color: #2563eb;
+        }
+        .status-msg {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 14px;
+            min-height: 20px;
+            font-weight: bold;
+        }
+        /* ปุ่มสีเขียวเรืองแสงเมื่อพร้อมใช้งาน */
+        .btn-go-main {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background-color: #1e293b;
+            color: #64748b;
+            text-align: center;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            box-sizing: border-box;
+            border: 2px solid #334155;
+            cursor: not-allowed;
+            transition: all 0.4s ease;
+        }
+        .btn-go-main.active {
+            background-color: #00ffcc;
+            color: #000000;
+            border: 2px solid #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.6);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h2>สมัครสมาชิก / ตรวจสอบบัญชี</h2>
+    
+    <form id="secureForm">
+        <div class="form-group">
+            <label for="emailInput">กรอกอีเมลของคุณ:</label>
+            <input type="email" id="emailInput" required placeholder="example@email.com">
+        </div>
+        <div class="form-group">
+            <label for="pinInput">ตั้งรหัสผ่าน (ระบุเป็นตัวเลขเท่านั้น):</label>
+            <!-- เปลี่ยนเป็นโหมดป้อนตัวเลขเท่านั้น -->
+            <input type="number" id="pinInput" pattern="[0-9]*" inputmode="numeric" required placeholder="เช่น 123456">
+        </div>
+        <button type="submit" class="btn-submit">ตรวจสอบและลงทะเบียน</button>
+    </form>
+
+    <div id="statusMessage" class="status-msg"></div>
+
+    <!-- ปุ่มสีเขียวสำหรับกด ย้ายไปใช้ปุ่มและฟังก์ชันคลิกแบบปลอดภัยแทนแท็กลิงก์ปกติ -->
+    <div id="secureGate" class="btn-go-main">
+        🚀 กำลังเตรียมระบบความปลอดภัย...
+    </div>
+</div>
+
+<script>
+    // 🛡️ ระบบซ่อนลิงก์เว็บหลัก: แปลง URL ให้อยู่ในรูป Base64 เพื่อไม่ให้ใครมองเห็นลิงก์ตรงๆ ในโค้ดตัวอักษร
+    // ข้อความข้างล่างนี้ถอดรหัสออกมาจะได้ลิงก์เว็บของคุณพอดี
+    const _secretData = "aHR0cHM6Ly9haTg2Mzk2NDdnLWNlbGwuZ2l0aHViLmlvL0dHQi8/dXRtX3NvdXJjZT1jaGF0Z3B0LmNvbQ==";
+    
+    function getSecureTarget() {
+        return atob(_secretData); // ถอดรหัสเฉพาะตอนจะใช้งานจริงเท่านั้น
+    }
+
+    // 🔒 ระบบป้องกันเบื้องต้น: ห้ามคลิกขวาบนหน้าจอ
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // ป้องกันปุ่มคีย์ลัดสำหรับเปิดเครื่องมือตรวจโค้ด (F12, Ctrl+Shift+I)
+    document.addEventListener('keydown', function(e) {
+        if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74))) {
+            e.preventDefault();
+        }
+    });
+
+    const form = document.getElementById('secureForm');
+    const statusMessage = document.getElementById('statusMessage');
+    const secureGate = document.getElementById('secureGate');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('emailInput').value.trim();
+        const pinCode = document.getElementById('pinInput').value.trim();
+
+        // ค้นหาอีเมลในระบบบันทึกความจำ
+        const storedPin = localStorage.getItem(email);
+
+        if (storedPin) {
+            // 🔄 เคส 1: เคยสมัครแล้ว -> บันทึกข้อมูลซ้ำ ดึงรหัสเดิมออกมา และทำการเด้งทันที!
+            document.getElementById('pinInput').value = storedPin;
+            statusMessage.style.color = '#38bdf8';
+            statusMessage.innerText = "พบประวัติเดิมในระบบ! กำลังเด้งเข้าสู่หน้าเว็บหลักอัตโนมัติ...";
+            
+            // เปิดใช้งานปุ่มเขียวให้เรืองแสง
+            secureGate.classList.add('active');
+            secureGate.innerText = "🚀 เข้าสู่ระบบสำเร็จแล้ว";
+
+            // หน่วงเวลา 1.5 วินาทีแล้วเด้งหน้าจอทันที
+            setTimeout(() => {
+                window.location.replace(getSecureTarget());
+            }, 1500);
+
+        } else {
+            // 📝 เคส 2: ยังไม่เคยสมัคร -> บันทึกอีเมลและรหัสตัวเลขใหม่เข้าสู่ระบบ
+            localStorage.setItem(email, pinCode);
+            statusMessage.style.color = '#4ade80';
+            statusMessage.innerText = "สมัครสมาชิกใหม่และบันทึกข้อมูลสำเร็จ!";
+            
+            // เปิดใช้งานปุ่มสีเขียวเพื่อให้กดด้วยตัวเองได้
+            secureGate.classList.add('active');
+            secureGate.innerText = "🚀 คลิกตรงนี้เพื่อเข้าสู่หน้าเว็บหลัก";
+            
+            // ผูกฟังก์ชันการเปลี่ยนหน้าไว้กับปุ่มแบบซ่อนลิงก์
+            secureGate.onclick = function() {
+                window.location.href = getSecureTarget();
+            };
+        }
+    });
+</script>
+
+</body>
+</html>
