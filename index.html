@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GGB Account</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,"Noto Sans Thai",sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:
+        radial-gradient(circle at top,#243b80 0%,#0b1020 45%,#05070d 100%);
+    color:white;
+    overflow:hidden;
+}
+
+.bg{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+        radial-gradient(circle at 20% 20%,rgba(0,140,255,.18),transparent 30%),
+        radial-gradient(circle at 80% 80%,rgba(130,60,255,.18),transparent 30%);
+}
+
+.card{
+    position:relative;
+    width:min(430px,92%);
+    padding:32px;
+    border-radius:28px;
+    background:rgba(15,20,38,.82);
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:0 25px 80px rgba(0,0,0,.55);
+    backdrop-filter:blur(20px);
+}
+
+.logo{
+    width:72px;
+    height:72px;
+    margin:0 auto 15px;
+    border-radius:22px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:27px;
+    font-weight:900;
+    background:linear-gradient(135deg,#00d4ff,#635bff);
+    box-shadow:0 0 35px rgba(0,180,255,.35);
+}
+
+h1{
+    text-align:center;
+    font-size:28px;
+    margin-bottom:7px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#aeb7cf;
+    font-size:14px;
+    margin-bottom:25px;
+}
+
+.form{
+    display:none;
+}
+
+.form.active{
+    display:block;
+}
+
+label{
+    display:block;
+    margin:14px 0 7px;
+    color:#cbd4eb;
+    font-size:14px;
+}
+
+input{
+    width:100%;
+    padding:14px 15px;
+    border-radius:13px;
+    border:1px solid #303a58;
+    outline:none;
+    background:#0c1122;
+    color:white;
+    font-size:15px;
+    transition:.2s;
+}
+
+input:focus{
+    border-color:#00c8ff;
+    box-shadow:0 0 0 3px rgba(0,200,255,.1);
+}
+
+button{
+    width:100%;
+    border:0;
+    padding:14px;
+    margin-top:18px;
+    border-radius:14px;
+    color:white;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+    background:linear-gradient(135deg,#00bfff,#635bff);
+    box-shadow:0 8px 25px rgba(0,150,255,.22);
+    transition:.2s;
+}
+
+button:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.08);
+}
+
+button:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.link{
+    display:block;
+    text-align:center;
+    margin-top:17px;
+    color:#48d8ff;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.link:hover{
+    text-decoration:underline;
+}
+
+.message{
+    display:none;
+    margin-top:15px;
+    padding:12px;
+    border-radius:12px;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.message.show{
+    display:block;
+}
+
+.message.error{
+    background:rgba(255,60,90,.12);
+    border:1px solid rgba(255,60,90,.3);
+    color:#ff9aaa;
+}
+
+.message.success{
+    background:rgba(0,220,150,.1);
+    border:1px solid rgba(0,220,150,.25);
+    color:#72f5c5;
+}
+
+.verify{
+    text-align:center;
+}
+
+.verify .icon{
+    font-size:55px;
+    margin-bottom:15px;
+}
+
+.small{
+    color:#8994af;
+    font-size:12px;
+    text-align:center;
+    margin-top:20px;
+    line-height:1.5;
+}
+
+.spinner{
+    display:inline-block;
+    width:15px;
+    height:15px;
+    border:2px solid rgba(255,255,255,.35);
+    border-top-color:white;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    vertical-align:middle;
+    margin-right:6px;
+}
+
+@keyframes spin{
+    to{transform:rotate(360deg)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<div class="card">
+
+    <div class="logo">GGB</div>
+
+    <h1>GGB Account</h1>
+    <div class="subtitle">สร้างบัญชีเพื่อเข้าสู่เว็บหลักของคุณ</div>
+
+    <!-- LOGIN -->
+    <div id="loginForm" class="form active">
+
+        <label>อีเมล</label>
+        <input id="loginEmail"
+               type="email"
+               autocomplete="email"
+               placeholder="example@email.com">
+
+        <label>รหัสผ่าน</label>
+        <input id="loginPassword"
+               type="password"
+               autocomplete="current-password"
+               placeholder="••••••••">
+
+        <button id="loginBtn" onclick="login()">
+            เข้าสู่ระบบ
+        </button>
+
+        <div class="link" onclick="showForm('register')">
+            ยังไม่มีบัญชี? สมัครสมาชิก
+        </div>
+
+        <div class="link" onclick="showForm('forgot')">
+            ลืมรหัสผ่าน?
+        </div>
+
+        <div id="loginMessage" class="message"></div>
+    </div>
+
+
+    <!-- REGISTER -->
+    <div id="registerForm" class="form">
+
+        <label>อีเมล</label>
+        <input id="registerEmail"
+               type="email"
+               autocomplete="email"
+               placeholder="example@email.com">
+
+        <label>รหัสผ่าน</label>
+        <input id="registerPassword"
+               type="password"
+               autocomplete="new-password"
+               placeholder="อย่างน้อย 6 ตัวอักษร">
+
+        <label>ยืนยันรหัสผ่าน</label>
+        <input id="registerConfirm"
+               type="password"
+               autocomplete="new-password"
+               placeholder="กรอกรหัสผ่านอีกครั้ง">
+
+        <button id="registerBtn" onclick="register()">
+            สมัครบัญชี
+        </button>
+
+        <div class="link" onclick="showForm('login')">
+            มีบัญชีอยู่แล้ว? เข้าสู่ระบบ
+        </div>
+
+        <div id="registerMessage" class="message"></div>
+    </div>
+
+
+    <!-- FORGOT -->
+    <div id="forgotForm" class="form">
+
+        <label>อีเมลของบัญชี</label>
+
+        <input id="forgotEmail"
+               type="email"
+               autocomplete="email"
+               placeholder="example@email.com">
+
+        <button id="forgotBtn" onclick="forgotPassword()">
+            ส่งลิงก์กู้คืน
+        </button>
+
+        <div class="link" onclick="showForm('login')">
+            ← กลับเข้าสู่ระบบ
+        </div>
+
+        <div id="forgotMessage" class="message"></div>
+    </div>
+
+
+    <!-- VERIFY -->
+    <div id="verifyForm" class="form verify">
+
+        <div class="icon">📧</div>
+
+        <h2>ตรวจสอบอีเมลของคุณ</h2>
+
+        <p style="margin-top:12px;color:#aeb7cf;line-height:1.6">
+            เราส่งลิงก์ยืนยันไปยังอีเมลของคุณแล้ว
+            กรุณาเปิดอีเมลและกดยืนยันก่อนเข้าสู่เว็บหลัก
+        </p>
+
+        <button onclick="checkVerification()">
+            ฉันยืนยันอีเมลแล้ว
+        </button>
+
+        <button onclick="resendVerification()"
+                style="background:#1b2745">
+            ส่งอีเมลยืนยันอีกครั้ง
+        </button>
+
+        <div class="link" onclick="logout()">
+            ออกจากระบบ
+        </div>
+
+        <div id="verifyMessage" class="message"></div>
+    </div>
+
+
+    <div class="small">
+        ระบบบัญชี GGB<br>
+        รหัสผ่านจะไม่ถูกเก็บไว้ในหน้าเว็บ
+    </div>
+
+</div>
+
+
+<!-- Firebase -->
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendEmailVerification,
+    sendPasswordResetEmail,
+    signOut,
+    onAuthStateChanged,
+    reload
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+// ======================================================
+// 🔥 ใส่ Firebase Config ของคุณตรงนี้
+// ======================================================
+
+const firebaseConfig = {
+
+    apiKey: "ใส่_API_KEY_ของคุณ",
+
+    authDomain: "ใส่_PROJECT_ID.firebaseapp.com",
+
+    projectId: "ใส่_PROJECT_ID",
+
+    storageBucket: "ใส่_PROJECT_ID.firebasestorage.app",
+
+    messagingSenderId: "ใส่_MESSAGING_SENDER_ID",
+
+    appId: "ใส่_APP_ID"
+
+};
+
+
+// ======================================================
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+
+// เว็บหลักของคุณ
+const MAIN_WEBSITE =
+"https://ai8639647g-cell.github.io/GGB/?utm_source=chatgpt.com";
+
+
+// ------------------------------------------------------
+// เปลี่ยนหน้า
+// ------------------------------------------------------
+
+window.showForm = function(name){
+
+    document.querySelectorAll(".form")
+        .forEach(x => x.classList.remove("active"));
+
+    const target =
+        document.getElementById(name + "Form");
+
+    if(target){
+        target.classList.add("active");
+    }
+
+    clearMessages();
+};
+
+
+// ------------------------------------------------------
+// ข้อความ
+// ------------------------------------------------------
+
+function message(id,text,type){
+
+    const box = document.getElementById(id);
+
+    box.textContent = text;
+
+    box.className =
+        "message show " + type;
+}
+
+
+function clearMessages(){
+
+    document.querySelectorAll(".message")
+        .forEach(x => {
+            x.className = "message";
+            x.textContent = "";
+        });
+
+}
+
+
+// ------------------------------------------------------
+// สมัครบัญชี
+// ------------------------------------------------------
+
+window.register = async function(){
+
+    const email =
+        document.getElementById("registerEmail")
+        .value.trim();
+
+    const password =
+        document.getElementById("registerPassword")
+        .value;
+
+    const confirm =
+        document.getElementById("registerConfirm")
+        .value;
+
+    if(!email || !password){
+
+        message(
+            "registerMessage",
+            "กรุณากรอกอีเมลและรหัสผ่าน",
+            "error"
+        );
+
+        return;
+    }
+
+    if(password.length < 6){
+
+        message(
+            "registerMessage",
+            "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+            "error"
+        );
+
+        return;
+    }
+
+    if(password !== confirm){
+
+        message(
+            "registerMessage",
+            "รหัสผ่านทั้งสองช่องไม่ตรงกัน",
+            "error"
+        );
+
+        return;
+    }
+
+    const btn =
+        document.getElementById("registerBtn");
+
+    btn.disabled = true;
+    btn.innerHTML =
+        '<span class="spinner"></span>กำลังสร้างบัญชี...';
+
+    try{
+
+        const credential =
+            await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+
+        await sendEmailVerification(
+            credential.user
+        );
+
+        message(
+            "registerMessage",
+            "สร้างบัญชีสำเร็จ! กรุณาตรวจสอบอีเมลของคุณ",
+            "success"
+        );
+
+        setTimeout(() => {
+            showForm("verify");
+        },800);
+
+    }catch(error){
+
+        message(
+            "registerMessage",
+            firebaseError(error.code),
+            "error"
+        );
+
+    }finally{
+
+        btn.disabled = false;
+        btn.textContent = "สมัครบัญชี";
+
+    }
+};
+
+
+// ------------------------------------------------------
+// Login
+// ------------------------------------------------------
+
+window.login = async function(){
+
+    const email =
+        document.getElementById("loginEmail")
+        .value.trim();
+
+    const password =
+        document.getElementById("loginPassword")
+        .value;
+
+    if(!email || !password){
+
+        message(
+            "loginMessage",
+            "กรุณากรอกอีเมลและรหัสผ่าน",
+            "error"
+        );
+
+        return;
+    }
+
+    const btn =
+        document.getElementById("loginBtn");
+
+    btn.disabled = true;
+    btn.innerHTML =
+        '<span class="spinner"></span>กำลังเข้าสู่ระบบ...';
+
+    try{
+
+        const credential =
+            await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+
+        await reload(credential.user);
+
+        if(!credential.user.emailVerified){
+
+            message(
+                "loginMessage",
+                "กรุณายืนยันอีเมลก่อนเข้าสู่เว็บหลัก",
+                "error"
+            );
+
+            setTimeout(() => {
+                showForm("verify");
+            },700);
+
+            return;
+        }
+
+        message(
+            "loginMessage",
+            "เข้าสู่ระบบสำเร็จ กำลังเปิดเว็บหลัก...",
+            "success"
+        );
+
+        setTimeout(() => {
+
+            window.location.href =
+                MAIN_WEBSITE;
+
+        },800);
+
+    }catch(error){
+
+        message(
+            "loginMessage",
+            firebaseError(error.code),
+            "error"
+        );
+
+    }finally{
+
+        btn.disabled = false;
+        btn.textContent = "เข้าสู่ระบบ";
+
+    }
+};
+
+
+// ------------------------------------------------------
+// ตรวจสอบ Email
+// ------------------------------------------------------
+
+window.checkVerification = async function(){
+
+    if(!auth.currentUser){
+
+        showForm("login");
+        return;
+    }
+
+    try{
+
+        await reload(auth.currentUser);
+
+        if(auth.currentUser.emailVerified){
+
+            message(
+                "verifyMessage",
+                "ยืนยันอีเมลสำเร็จ! กำลังเข้าสู่เว็บหลัก...",
+                "success"
+            );
+
+            setTimeout(() => {
+
+                window.location.href =
+                    MAIN_WEBSITE;
+
+            },800);
+
+        }else{
+
+            message(
+                "verifyMessage",
+                "ยังไม่พบการยืนยัน กรุณาเปิดอีเมลแล้วกดลิงก์ยืนยันก่อน",
+                "error"
+            );
+
+        }
+
+    }catch(error){
+
+        message(
+            "verifyMessage",
+            firebaseError(error.code),
+            "error"
+        );
+
+    }
+};
+
+
+// ------------------------------------------------------
+// ส่ง Email ยืนยันอีกครั้ง
+// ------------------------------------------------------
+
+window.resendVerification = async function(){
+
+    if(!auth.currentUser){
+
+        showForm("login");
+        return;
+    }
+
+    try{
+
+        await sendEmailVerification(
+            auth.currentUser
+        );
+
+        message(
+            "verifyMessage",
+            "ส่งอีเมลยืนยันอีกครั้งแล้ว กรุณาตรวจสอบกล่องจดหมาย",
+            "success"
+        );
+
+    }catch(error){
+
+        message(
+            "verifyMessage",
+            firebaseError(error.code),
+            "error"
+        );
+
+    }
+};
+
+
+// ------------------------------------------------------
+// กู้คืนรหัสผ่าน
+// ------------------------------------------------------
+
+window.forgotPassword = async function(){
+
+    const email =
+        document.getElementById("forgotEmail")
+        .value.trim();
+
+    if(!email){
+
+        message(
+            "forgotMessage",
+            "กรุณากรอกอีเมลของบัญชี",
+            "error"
+        );
+
+        return;
+    }
+
+    const btn =
+        document.getElementById("forgotBtn");
+
+    btn.disabled = true;
+
+    btn.innerHTML =
+        '<span class="spinner"></span>กำลังส่ง...';
+
+    try{
+
+        await sendPasswordResetEmail(
+            auth,
+            email
+        );
+
+        message(
+            "forgotMessage",
+            "ส่งลิงก์กู้คืนรหัสผ่านไปยังอีเมลแล้ว กรุณาตรวจสอบกล่องจดหมาย",
+            "success"
+        );
+
+    }catch(error){
+
+        message(
+            "forgotMessage",
+            firebaseError(error.code),
+            "error"
+        );
+
+    }finally{
+
+        btn.disabled = false;
+        btn.textContent = "ส่งลิงก์กู้คืน";
+
+    }
+};
+
+
+// ------------------------------------------------------
+// Logout
+// ------------------------------------------------------
+
+window.logout = async function(){
+
+    try{
+
+        await signOut(auth);
+        showForm("login");
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+};
+
+
+// ------------------------------------------------------
+// ตรวจสอบสถานะบัญชี
+// ------------------------------------------------------
+
+onAuthStateChanged(auth, async user => {
+
+    if(!user){
+        return;
+    }
+
+    try{
+
+        await reload(user);
+
+        if(user.emailVerified){
+
+            // ถ้าเปิดหน้า login ทั้งที่ login อยู่แล้ว
+            // ให้ไปเว็บหลักทันที
+
+            if(
+                document
+                .getElementById("loginForm")
+                .classList.contains("active")
+            ){
+
+                window.location.href =
+                    MAIN_WEBSITE;
+
+            }
+
+        }else{
+
+            showForm("verify");
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+});
+
+
+// ------------------------------------------------------
+// แปลง Error Firebase ให้เป็นภาษาไทย
+// ------------------------------------------------------
+
+function firebaseError(code){
+
+    switch(code){
+
+        case "auth/email-already-in-use":
+            return "อีเมลนี้มีบัญชีอยู่แล้ว";
+
+        case "auth/invalid-email":
+            return "รูปแบบอีเมลไม่ถูกต้อง";
+
+        case "auth/weak-password":
+            return "รหัสผ่านไม่ปลอดภัยเพียงพอ";
+
+        case "auth/invalid-credential":
+            return "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+
+        case "auth/user-not-found":
+            return "ไม่พบบัญชีนี้";
+
+        case "auth/wrong-password":
+            return "รหัสผ่านไม่ถูกต้อง";
+
+        case "auth/too-many-requests":
+            return "มีการลองหลายครั้งเกินไป กรุณารอสักครู่";
+
+        case "auth/network-request-failed":
+            return "ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้";
+
+        case "auth/operation-not-allowed":
+            return "ยังไม่ได้เปิด Email/Password Authentication ใน Firebase";
+
+        default:
+            return "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+
+    }
+}
+
+</script>
+
+</body>
+</html>
