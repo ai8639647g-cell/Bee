@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>เข้าสู่ระบบ</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    background:
+        radial-gradient(circle at top,#123b30,#06120f 55%,#020605);
+    font-family:Arial,"Noto Sans Thai",sans-serif;
+    color:white;
+}
+
+.box{
+    width:100%;
+    max-width:420px;
+    background:rgba(10,25,21,.94);
+    border:1px solid rgba(0,255,170,.25);
+    border-radius:22px;
+    padding:28px;
+    box-shadow:0 0 40px rgba(0,255,170,.12);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:8px;
+    font-size:28px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#9bb8ae;
+    margin-bottom:25px;
+    font-size:14px;
+}
+
+input{
+    width:100%;
+    padding:15px;
+    margin-top:10px;
+    border-radius:12px;
+    border:1px solid #31594e;
+    outline:none;
+    background:#07130f;
+    color:white;
+    font-size:16px;
+}
+
+input:focus{
+    border-color:#00e6a0;
+    box-shadow:0 0 10px rgba(0,230,160,.15);
+}
+
+button{
+    width:100%;
+    padding:15px;
+    margin-top:14px;
+    border:0;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.primary{
+    background:#00d995;
+    color:#00130d;
+}
+
+.primary:hover{
+    background:#00f0a5;
+}
+
+.secondary{
+    background:#18382f;
+    color:white;
+}
+
+.secondary:hover{
+    background:#225346;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.links{
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+}
+
+.links button{
+    margin-top:0;
+    font-size:14px;
+}
+
+.message{
+    display:none;
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:10px;
+    text-align:center;
+    font-size:14px;
+    line-height:1.5;
+}
+
+.success{
+    display:block;
+    background:rgba(0,210,145,.12);
+    border:1px solid #00d995;
+    color:#63ffc9;
+}
+
+.error{
+    display:block;
+    background:rgba(255,70,70,.12);
+    border:1px solid #ff5757;
+    color:#ff9b9b;
+}
+
+.info{
+    display:block;
+    background:rgba(80,160,255,.12);
+    border:1px solid #4d9dff;
+    color:#9bc8ff;
+}
+
+label{
+    display:block;
+    margin-top:12px;
+    color:#c4d8d1;
+    font-size:14px;
+}
+
+.small{
+    margin-top:15px;
+    text-align:center;
+    color:#718f84;
+    font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1 id="title">เข้าสู่ระบบ</h1>
+    <div class="subtitle" id="subtitle">
+        ใส่อีเมลและรหัสผ่านเพื่อเข้าสู่เว็บไซต์
+    </div>
+
+    <div id="message" class="message"></div>
+
+
+    <!-- ================= LOGIN ================= -->
+
+    <form id="loginForm">
+
+        <label>อีเมล</label>
+        <input
+            id="loginEmail"
+            type="email"
+            placeholder="example@email.com"
+            required
+        >
+
+        <label>รหัสผ่าน</label>
+        <input
+            id="loginPassword"
+            type="password"
+            placeholder="รหัสผ่าน"
+            required
+        >
+
+        <button id="loginButton" class="primary" type="submit">
+            เข้าสู่ระบบ
+        </button>
+
+    </form>
+
+
+    <!-- ================= REGISTER ================= -->
+
+    <form id="registerForm" class="hidden">
+
+        <label>อีเมล</label>
+        <input
+            id="registerEmail"
+            type="email"
+            placeholder="example@email.com"
+            required
+        >
+
+        <label>รหัสผ่าน</label>
+        <input
+            id="registerPassword"
+            type="password"
+            placeholder="อย่างน้อย 6 ตัวอักษร"
+            minlength="6"
+            required
+        >
+
+        <label>ยืนยันรหัสผ่าน</label>
+        <input
+            id="registerConfirm"
+            type="password"
+            placeholder="ใส่รหัสผ่านอีกครั้ง"
+            minlength="6"
+            required
+        >
+
+        <button id="registerButton" class="primary" type="submit">
+            สมัครบัญชี
+        </button>
+
+    </form>
+
+
+    <!-- ================= RECOVERY ================= -->
+
+    <form id="recoveryForm" class="hidden">
+
+        <label>อีเมลสำหรับกู้คืน</label>
+        <input
+            id="recoveryEmail"
+            type="email"
+            placeholder="example@email.com"
+            required
+        >
+
+        <button id="recoveryButton" class="primary" type="submit">
+            ส่งคำขอกู้คืนไปทางอีเมล
+        </button>
+
+    </form>
+
+
+    <!-- ================= NEW PASSWORD ================= -->
+
+    <form id="newPasswordForm" class="hidden">
+
+        <label>รหัสผ่านใหม่</label>
+        <input
+            id="newPassword"
+            type="password"
+            placeholder="รหัสผ่านใหม่"
+            minlength="6"
+            required
+        >
+
+        <label>ยืนยันรหัสผ่านใหม่</label>
+        <input
+            id="newPasswordConfirm"
+            type="password"
+            placeholder="ใส่รหัสผ่านใหม่อีกครั้ง"
+            minlength="6"
+            required
+        >
+
+        <button class="primary" type="submit">
+            ตั้งรหัสผ่านใหม่
+        </button>
+
+    </form>
+
+
+    <!-- ================= BUTTONS ================= -->
+
+    <div id="normalLinks" class="links">
+
+        <button
+            type="button"
+            class="secondary"
+            onclick="showRegister()">
+            สมัครบัญชี
+        </button>
+
+        <button
+            type="button"
+            class="secondary"
+            onclick="showRecovery()">
+            กู้คืนรหัสผ่าน
+        </button>
+
+    </div>
+
+    <button
+        id="backButton"
+        type="button"
+        class="secondary hidden"
+        onclick="showLogin()">
+        ← กลับเข้าสู่ระบบ
+    </button>
+
+    <div class="small">
+        ระบบบัญชีและการยืนยันจัดการโดย Supabase
+    </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   1. ตั้งค่า SUPABASE
+   ===================================================== */
+
+const SUPABASE_URL = "ใส่_SUPABASE_PROJECT_URL_ตรงนี้";
+
+const SUPABASE_PUBLISHABLE_KEY =
+    "ใส่_SUPABASE_PUBLISHABLE_KEY_ตรงนี้";
+
+
+/* =====================================================
+   2. เว็บหลักของคุณ
+   ===================================================== */
+
+const MAIN_WEBSITE =
+    "https://ai8639647g-cell.github.io/GGB/";
+
+
+/* =====================================================
+   3. สร้าง Supabase Client
+   ===================================================== */
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+    );
+
+
+/* =====================================================
+   ELEMENTS
+   ===================================================== */
+
+const message =
+    document.getElementById("message");
+
+const title =
+    document.getElementById("title");
+
+const subtitle =
+    document.getElementById("subtitle");
+
+const loginForm =
+    document.getElementById("loginForm");
+
+const registerForm =
+    document.getElementById("registerForm");
+
+const recoveryForm =
+    document.getElementById("recoveryForm");
+
+const newPasswordForm =
+    document.getElementById("newPasswordForm");
+
+const normalLinks =
+    document.getElementById("normalLinks");
+
+const backButton =
+    document.getElementById("backButton");
+
+
+/* =====================================================
+   MESSAGE
+   ===================================================== */
+
+function showMessage(text,type="info"){
+
+    message.textContent = text;
+
+    message.className =
+        "message " + type;
+
+}
+
+function clearMessage(){
+
+    message.textContent = "";
+
+    message.className = "message";
+
+}
+
+
+/* =====================================================
+   ซ่อนทุก FORM
+   ===================================================== */
+
+function hideAllForms(){
+
+    loginForm.classList.add("hidden");
+
+    registerForm.classList.add("hidden");
+
+    recoveryForm.classList.add("hidden");
+
+    newPasswordForm.classList.add("hidden");
+
+}
+
+
+/* =====================================================
+   LOGIN
+   ===================================================== */
+
+function showLogin(){
+
+    hideAllForms();
+
+    loginForm.classList.remove("hidden");
+
+    normalLinks.classList.remove("hidden");
+
+    backButton.classList.add("hidden");
+
+    title.textContent = "เข้าสู่ระบบ";
+
+    subtitle.textContent =
+        "ใส่อีเมลและรหัสผ่านเพื่อเข้าสู่เว็บไซต์";
+
+    clearMessage();
+
+}
+
+
+/* =====================================================
+   REGISTER
+   ===================================================== */
+
+function showRegister(){
+
+    hideAllForms();
+
+    registerForm.classList.remove("hidden");
+
+    normalLinks.classList.add("hidden");
+
+    backButton.classList.remove("hidden");
+
+    title.textContent = "สมัครบัญชี";
+
+    subtitle.textContent =
+        "สมัครด้วยอีเมลและรหัสผ่าน";
+
+    clearMessage();
+
+}
+
+
+/* =====================================================
+   RECOVERY
+   ===================================================== */
+
+function showRecovery(){
+
+    hideAllForms();
+
+    recoveryForm.classList.remove("hidden");
+
+    normalLinks.classList.add("hidden");
+
+    backButton.classList.remove("hidden");
+
+    title.textContent = "กู้คืนรหัสผ่าน";
+
+    subtitle.textContent =
+        "ใส่อีเมล แล้วระบบจะส่งลิงก์กู้คืนไปทางอีเมล";
+
+    clearMessage();
+
+}
+
+
+/* =====================================================
+   NEW PASSWORD
+   ===================================================== */
+
+function showNewPassword(){
+
+    hideAllForms();
+
+    newPasswordForm.classList.remove("hidden");
+
+    normalLinks.classList.add("hidden");
+
+    backButton.classList.add("hidden");
+
+    title.textContent = "ตั้งรหัสผ่านใหม่";
+
+    subtitle.textContent =
+        "ตั้งรหัสผ่านใหม่เพื่อกลับเข้าสู่เว็บไซต์";
+
+    clearMessage();
+
+}
+
+
+/* =====================================================
+   REDIRECT
+   ===================================================== */
+
+function goToMainWebsite(){
+
+    showMessage(
+        "เข้าสู่ระบบสำเร็จ กำลังเข้าสู่เว็บไซต์...",
+        "success"
+    );
+
+    setTimeout(function(){
+
+        window.location.replace(MAIN_WEBSITE);
+
+    },700);
+
+}
+
+
+/* =====================================================
+   ACTIVITY LOG
+   ===================================================== */
+
+async function logActivity(
+    userId,
+    eventType,
+    details={}
+){
+
+    if(!userId) return;
+
+    try{
+
+        await supabaseClient
+            .from("activity_logs")
+            .insert({
+
+                user_id:userId,
+
+                event_type:eventType,
+
+                page:window.location.href,
+
+                details:details
+
+            });
+
+    }catch(error){
+
+        console.log(
+            "Activity log error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   LOGIN
+   ===================================================== */
+
+loginForm.addEventListener(
+"submit",
+async function(e){
+
+    e.preventDefault();
+
+    clearMessage();
+
+    const email =
+        document.getElementById(
+            "loginEmail"
+        ).value.trim();
+
+    const password =
+        document.getElementById(
+            "loginPassword"
+        ).value;
+
+
+    if(!email || !password){
+
+        showMessage(
+            "กรุณากรอกอีเมลและรหัสผ่าน",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "loginButton"
+        );
+
+    button.disabled = true;
+
+    button.textContent =
+        "กำลังตรวจสอบ...";
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+        await supabaseClient.auth
+            .signInWithPassword({
+
+                email:email,
+
+                password:password
+
+            });
+
+
+        if(error){
+
+            showMessage(
+                "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if(!data.user){
+
+            showMessage(
+                "ไม่สามารถเข้าสู่ระบบได้",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        await logActivity(
+            data.user.id,
+            "login",
+            {
+                message:"เข้าสู่ระบบสำเร็จ"
+            }
+        );
+
+
+        goToMainWebsite();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "เกิดข้อผิดพลาดในการเข้าสู่ระบบ",
+            "error"
+        );
+
+    }finally{
+
+        button.disabled = false;
+
+        button.textContent =
+            "เข้าสู่ระบบ";
+
+    }
+
+});
+
+
+/* =====================================================
+   REGISTER
+   ===================================================== */
+
+registerForm.addEventListener(
+"submit",
+async function(e){
+
+    e.preventDefault();
+
+    clearMessage();
+
+    const email =
+        document.getElementById(
+            "registerEmail"
+        ).value.trim();
+
+    const password =
+        document.getElementById(
+            "registerPassword"
+        ).value;
+
+    const confirm =
+        document.getElementById(
+            "registerConfirm"
+        ).value;
+
+
+    if(password !== confirm){
+
+        showMessage(
+            "รหัสผ่านทั้งสองช่องไม่ตรงกัน",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(password.length < 6){
+
+        showMessage(
+            "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "registerButton"
+        );
+
+    button.disabled = true;
+
+    button.textContent =
+        "กำลังสมัครบัญชี...";
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+        await supabaseClient.auth
+            .signUp({
+
+                email:email,
+
+                password:password
+
+            });
+
+
+        if(error){
+
+            showMessage(
+                error.message,
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if(!data.user){
+
+            showMessage(
+                "สมัครบัญชีไม่สำเร็จ",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        /*
+         * ถ้า Supabase เปิด Email Confirmation
+         * จะยังไม่มี session
+         */
+
+        if(data.session){
+
+            await logActivity(
+                data.user.id,
+                "register",
+                {
+                    message:"สมัครบัญชีสำเร็จ"
+                }
+            );
+
+            goToMainWebsite();
+
+        }else{
+
+            showMessage(
+                "สมัครสำเร็จแล้ว กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี จากนั้นเข้าสู่ระบบ",
+                "success"
+            );
+
+        }
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "เกิดข้อผิดพลาดในการสมัครบัญชี",
+            "error"
+        );
+
+    }finally{
+
+        button.disabled = false;
+
+        button.textContent =
+            "สมัครบัญชี";
+
+    }
+
+});
+
+
+/* =====================================================
+   RECOVERY REQUEST
+   ===================================================== */
+
+recoveryForm.addEventListener(
+"submit",
+async function(e){
+
+    e.preventDefault();
+
+    clearMessage();
+
+    const email =
+        document.getElementById(
+            "recoveryEmail"
+        ).value.trim();
+
+
+    if(!email){
+
+        showMessage(
+            "กรุณาใส่อีเมล",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "recoveryButton"
+        );
+
+    button.disabled = true;
+
+    button.textContent =
+        "กำลังส่ง...";
+
+
+    try{
+
+        /*
+         * สำคัญ:
+         * URL นี้ต้องเป็น URL ของหน้า register.html
+         * ที่คุณเอาขึ้น GitHub Pages
+         */
+
+        const redirectUrl =
+            window.location.origin +
+            window.location.pathname +
+            "?reset=1";
+
+
+        const {
+            error
+        } =
+        await supabaseClient.auth
+            .resetPasswordForEmail(
+
+                email,
+
+                {
+                    redirectTo:redirectUrl
+                }
+
+            );
+
+
+        if(error){
+
+            showMessage(
+                error.message,
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        showMessage(
+            "ส่งคำขอกู้คืนแล้ว กรุณาตรวจสอบอีเมลของคุณ แล้วกดลิงก์ที่ได้รับ",
+            "success"
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "ไม่สามารถส่งคำขอกู้คืนได้",
+            "error"
+        );
+
+    }finally{
+
+        button.disabled = false;
+
+        button.textContent =
+            "ส่งคำขอกู้คืนไปทางอีเมล";
+
+    }
+
+});
+
+
+/* =====================================================
+   ตั้งรหัสผ่านใหม่
+   ===================================================== */
+
+newPasswordForm.addEventListener(
+"submit",
+async function(e){
+
+    e.preventDefault();
+
+    clearMessage();
+
+    const password =
+        document.getElementById(
+            "newPassword"
+        ).value;
+
+    const confirm =
+        document.getElementById(
+            "newPasswordConfirm"
+        ).value;
+
+
+    if(password.length < 6){
+
+        showMessage(
+            "รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(password !== confirm){
+
+        showMessage(
+            "รหัสผ่านทั้งสองช่องไม่ตรงกัน",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const {
+            data,
+            error
+        } =
+        await supabaseClient.auth
+            .updateUser({
+
+                password:password
+
+            });
+
+
+        if(error){
+
+            showMessage(
+                error.message,
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if(data.user){
+
+            await logActivity(
+                data.user.id,
+                "password_reset",
+                {
+                    message:
+                        "เปลี่ยนรหัสผ่านสำเร็จ"
+                }
+            );
+
+        }
+
+
+        showMessage(
+            "เปลี่ยนรหัสผ่านสำเร็จ กำลังเข้าสู่เว็บไซต์...",
+            "success"
+        );
+
+
+        setTimeout(function(){
+
+            window.location.replace(
+                MAIN_WEBSITE
+            );
+
+        },1000);
+
+
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            "ไม่สามารถเปลี่ยนรหัสผ่านได้",
+            "error"
+        );
+
+    }
+
+});
+
+
+/* =====================================================
+   ตรวจจับ PASSWORD RECOVERY
+   ===================================================== */
+
+supabaseClient.auth.onAuthStateChange(
+async function(event,session){
+
+    console.log(
+        "Auth event:",
+        event
+    );
+
+
+    if(event === "PASSWORD_RECOVERY"){
+
+        showNewPassword();
+
+    }
+
+});
+
+
+/* =====================================================
+   ตรวจสอบ URL ตอนเปิดหน้า
+   ===================================================== */
+
+async function checkRecovery(){
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    if(params.get("reset") === "1"){
+
+        /*
+         * ให้ Supabase จัดการ session
+         * จากลิงก์กู้คืน
+         */
+
+        const {
+            data
+        } =
+        await supabaseClient.auth
+            .getSession();
+
+
+        if(data.session){
+
+            showNewPassword();
+
+        }else{
+
+            showMessage(
+                "กรุณาเปิดลิงก์กู้คืนที่ได้รับจากอีเมลอีกครั้ง",
+                "error"
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =====================================================
+   เริ่มต้นระบบ
+   ===================================================== */
+
+showLogin();
+
+checkRecovery();
+
+</script>
+
+</body>
+</html>
