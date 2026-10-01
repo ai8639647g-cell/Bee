@@ -1,0 +1,691 @@
+<!DOCTYPE html><html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Native AI Code Generator</title>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head><body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans"><!-- 🌌 Header -->
+<header class="bg-slate-900 border-b border-slate-800 p-5 text-center shadow-lg">
+    <h1 class="text-3xl font-extrabold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+        🤖 Native AI Code Generator
+    </h1>
+
+    <p class="text-xs text-slate-400 mt-1.5 uppercase tracking-wider font-mono">
+        100% Local Engine / No External API Dependencies
+    </p>
+</header>
+
+
+<!-- 📥 Main Container -->
+<main class="flex-1 max-w-4xl w-full mx-auto p-6 flex flex-col gap-6">
+
+    <!-- ส่วนกรอกคำสั่ง Prompt -->
+    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col gap-4">
+
+        <div class="flex justify-between items-center gap-3">
+            <h2 class="text-lg font-semibold text-slate-200">
+                💡 พิมพ์คำสั่งสร้างโค้ดที่นี่
+            </h2>
+
+            <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full font-mono whitespace-nowrap">
+                Engine: Online & Active
+            </span>
+        </div>
+
+        <textarea
+            id="promptInput"
+            rows="4"
+            placeholder="ลองพิมพ์: 'สร้างปุ่มกดเล่นเสียงด้วย javascript' หรือ 'เขียน python วนลูป 1 ถึง 100' หรือ 'สร้างฟังก์ชันสุ่มตัวเลขใน js'"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition duration-200 resize-none font-medium"
+        ></textarea>
+
+        <button
+            id="generateBtn"
+            onclick="processLocalAI()"
+            class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-3.5 px-4 rounded-xl transition duration-200 shadow-md flex justify-center items-center gap-2 text-base"
+        >
+            <span>⚡ วิเคราะห์และสังเคราะห์โค้ด</span>
+        </button>
+
+    </div>
+
+
+    <!-- 📤 ส่วนแสดงผลลัพธ์ -->
+    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl flex flex-col gap-3 flex-1">
+
+        <div class="flex justify-between items-center gap-3">
+
+            <div class="flex items-center gap-2">
+                <h2 class="text-lg font-semibold text-slate-200">
+                    💻 ซอร์สโค้ดที่ระบบสร้างขึ้น:
+                </h2>
+
+                <span
+                    id="detectedLang"
+                    class="text-xs font-mono bg-slate-800 text-blue-400 px-2.5 py-0.5 rounded border border-slate-700 hidden"
+                ></span>
+            </div>
+
+            <button
+                onclick="copyCode()"
+                class="text-xs bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 transition font-medium whitespace-nowrap"
+            >
+                📋 คัดลอกโค้ด
+            </button>
+
+        </div>
+
+        <pre
+            id="outputResult"
+            class="w-full p-5 bg-slate-950 rounded-xl border border-slate-800 overflow-x-auto font-mono text-sm text-emerald-400 whitespace-pre shadow-inner min-h-[250px] leading-relaxed"
+        >พิมพ์ข้อความด้านบนแล้วกดปุ่มสร้างโค้ดได้ทันที...</pre>
+
+    </div>
+
+</main>
+
+
+<!-- 🧠 Native AI Code Synthesis Engine -->
+<script>
+
+    // =========================================================
+    // 🧠 KNOWLEDGE BASE
+    // =========================================================
+
+    const AI_KNOWLEDGE = {
+
+        languages: {
+
+            javascript: [
+                'js',
+                'javascript',
+                'จาวาสคริปต์',
+                'สคริปต์'
+            ],
+
+            python: [
+                'py',
+                'python',
+                'ไพธอน',
+                'ไพทอน'
+            ],
+
+            html: [
+                'html',
+                'เอชทีเอ็มแอล',
+                'หน้าเว็บ',
+                'โครงสร้าง'
+            ],
+
+            css: [
+                'css',
+                'ซีเอสเอส',
+                'ตกแต่ง',
+                'สไตล์'
+            ]
+
+        },
+
+        features: {
+
+            loop: [
+                'วนลูป',
+                'loop',
+                'for',
+                'while',
+                'ทำซ้ำ'
+            ],
+
+            random: [
+                'สุ่ม',
+                'random',
+                'shuffle'
+            ],
+
+            function: [
+                'ฟังก์ชัน',
+                'function',
+                'def',
+                'เมธอด'
+            ],
+
+            button: [
+                'ปุ่ม',
+                'button',
+                'click',
+                'คลิก'
+            ],
+
+            fetch: [
+                'api',
+                'fetch',
+                'ดึงข้อมูล',
+                'request'
+            ]
+
+        }
+
+    };
+
+
+    // =========================================================
+    // 🔍 ANALYZE USER INTENT
+    // =========================================================
+
+    function analyzeIntent(prompt) {
+
+        const text = prompt.toLowerCase();
+
+        let detectedLang = 'javascript';
+
+        let detectedFeatures = [];
+
+
+        // ตรวจหาภาษา
+        for (const [lang, keywords] of Object.entries(AI_KNOWLEDGE.languages)) {
+
+            if (keywords.some(keyword => text.includes(keyword))) {
+
+                detectedLang = lang;
+
+                break;
+            }
+
+        }
+
+
+        // ตรวจหา Feature
+        for (const [feature, keywords] of Object.entries(AI_KNOWLEDGE.features)) {
+
+            if (
+                keywords.some(keyword =>
+                    text.includes(keyword)
+                )
+            ) {
+
+                detectedFeatures.push(feature);
+
+            }
+
+        }
+
+
+        return {
+            lang: detectedLang,
+            features: detectedFeatures
+        };
+
+    }
+
+
+    // =========================================================
+    // ⚙️ CODE SYNTHESIZER
+    // =========================================================
+
+    function synthesizeCode(intent, prompt) {
+
+        let code = "";
+
+        let explanation =
+            `// 🤖 ผลลัพธ์วิเคราะห์คำสั่ง: "${prompt}"\n`;
+
+        explanation +=
+            `// 🛠️ ตรวจพบภาษา: ${intent.lang.toUpperCase()} | ` +
+            `ฟีเจอร์ที่ประมวลผล: [` +
+            `${intent.features.join(', ') || 'ทั่วไป'}]\n\n`;
+
+
+        // =====================================================
+        // JAVASCRIPT
+        // =====================================================
+
+        if (intent.lang === 'javascript') {
+
+            if (intent.features.includes('random')) {
+
+                code += `function getRandomNumber(min, max) {
+return Math.floor(Math.random() * (max - min + 1)) + min;
+
+}
+
+// ตัวอย่างการใช้งาน สุ่มเลข 1 ถึง 100
+const result = getRandomNumber(1, 100);
+
+console.log("เลขที่สุ่มได้คือ: " + result);`;
+
+            }
+
+            else if (intent.features.includes('loop')) {
+
+                code += `// วนลูปแสดงผลลัพธ์เลข 1 ถึง 10
+
+for (let i = 1; i <= 10; i++) {
+console.log("รอบที่: " + i);
+}`;
+
+            }
+
+            else if (intent.features.includes('fetch')) {
+
+                code += `async function fetchData(url) {
+
+try {
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error("HTTP Error: " + response.status);
+    }
+
+    const data = await response.json();
+
+    return data;
+
+} catch (error) {
+
+    console.error(
+        "เกิดข้อผิดพลาดในการดึงข้อมูล:",
+        error
+    );
+
+}
+
+}`;
+
+            }
+
+            else if (intent.features.includes('button')) {
+
+                code += `const button = document.createElement("button");
+
+button.textContent = "คลิกฉัน";
+
+button.addEventListener("click", () => {
+alert("สวัสดีจาก JavaScript!");
+});
+
+document.body.appendChild(button);`;
+
+            }
+
+            else {
+
+                code += `// ฟังก์ชันเริ่มต้นที่ระบบสร้างขึ้นอัตโนมัติ
+
+function processData() {
+
+const message =
+    "สวัสดีปี 2026 นี่คือโค้ดที่คุณสั่งสร้าง";
+
+console.log(message);
+
+return true;
+
+}
+
+processData();`;
+
+            }
+
+        }
+
+
+        // =====================================================
+        // PYTHON
+        // =====================================================
+
+        else if (intent.lang === 'python') {
+
+            if (intent.features.includes('random')) {
+
+                code += `import random
+
+def get_random_number(start, end):
+return random.randint(start, end)
+
+ตัวอย่างการใช้งาน
+
+result = get_random_number(1, 100)
+
+print(f"เลขสุ่มที่ได้คือ: {result}")`;
+
+            }
+
+            else if (intent.features.includes('loop')) {
+
+                code += `# วนลูปแสดงตัวเลข 1 ถึง 10 ด้วย Python
+
+for i in range(1, 11):
+print(f"รอบที่: {i}")`;
+
+            }
+
+            else if (intent.features.includes('function')) {
+
+                code += `def process_data():
+
+message = "สวัสดีจาก Python Engine"
+
+print(message)
+
+return True
+
+process_data()`;
+
+            }
+
+            else {
+
+                code += `def main():
+
+print("ยินดีต้อนรับสู่ระบบ Python Engine")
+
+# สามารถเพิ่มตรรกะโปรแกรมของคุณตรงนี้ได้เลย
+
+if name == "main":
+main()`;
+
+            }
+
+        }
+
+
+        // =====================================================
+        // HTML
+        // =====================================================
+
+        else if (intent.lang === 'html') {
+
+            code += `<!DOCTYPE html>
+
+<html lang="th"><head><meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>หน้าเว็บที่ระบบสร้างขึ้น</title>
+
+</head><body>
+`;            if (intent.features.includes('button')) {
+
+                code += `    <div style="text-align:center; margin-top:50px;">
+
+    <h1>ยินดีต้อนรับสู่หน้าเว็บ</h1>
+
+    <button
+        onclick="alert('สวัสดี!')"
+        style="
+            padding:10px 20px;
+            font-size:16px;
+            cursor:pointer;
+        "
+    >
+        คลิกที่นี่
+    </button>
+
+</div>
+
+`;
+
+            }
+
+            else {
+
+                code += `    <h1>
+    สวัสดีโลก!
+    นี่คือหน้าโครงสร้างพื้นฐาน HTML
+</h1>
+
+`;
+
+            }
+
+            code += `</body>
+
+</html>`;        }
+
+
+        // =====================================================
+        // CSS
+        // =====================================================
+
+        else if (intent.lang === 'css') {
+
+            code += `/* การตกแต่งสไตล์พื้นฐานจาก Native AI */
+
+body {
+background-color: #0f172a;
+color: #f8fafc;
+font-family: sans-serif;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+}
+`;
+
+            if (intent.features.includes('button')) {
+
+                code += `
+
+.btn-primary {
+background: linear-gradient(
+to right,
+#2563eb,
+#4f46e5
+);
+
+border: none;
+
+color: white;
+
+padding: 12px 24px;
+
+border-radius: 8px;
+
+cursor: pointer;
+
+transition: opacity 0.2s;
+
+}
+
+.btn-primary:hover {
+opacity: 0.9;
+}
+`;
+
+            }
+
+        }
+
+
+        return explanation + code;
+
+    }
+
+
+    // =========================================================
+    // 🚀 MAIN EXECUTION HANDLER
+    // =========================================================
+
+    function processLocalAI() {
+
+        const prompt =
+            document.getElementById('promptInput')
+            .value
+            .trim();
+
+        const output =
+            document.getElementById('outputResult');
+
+        const langBadge =
+            document.getElementById('detectedLang');
+
+        const generateBtn =
+            document.getElementById('generateBtn');
+
+
+        // ตรวจสอบ Prompt
+        if (!prompt) {
+
+            alert(
+                'กรุณากรอกคำสั่งหรือความต้องการลงในช่องรับข้อมูลก่อนครับ'
+            );
+
+            return;
+        }
+
+
+        // แสดงสถานะ
+        generateBtn.disabled = true;
+
+        generateBtn.classList.add(
+            'opacity-60',
+            'cursor-not-allowed'
+        );
+
+        output.innerText =
+            "🧠 [Native-Engine] กำลังวิเคราะห์ไวยากรณ์และแยกแยะ Semantic...";
+
+
+        // จำลองการประมวลผล
+        setTimeout(() => {
+
+            const intent =
+                analyzeIntent(prompt);
+
+            const finalCode =
+                synthesizeCode(intent, prompt);
+
+
+            // แสดงผล
+            output.innerText = finalCode;
+
+
+            // แสดงภาษา
+            langBadge.innerText =
+                intent.lang.toUpperCase();
+
+            langBadge.classList.remove(
+                'hidden'
+            );
+
+
+            // คืนสถานะปุ่ม
+            generateBtn.disabled = false;
+
+            generateBtn.classList.remove(
+                'opacity-60',
+                'cursor-not-allowed'
+            );
+
+        }, 400);
+
+    }
+
+
+    // =========================================================
+    // 📋 COPY CODE
+    // =========================================================
+
+    async function copyCode() {
+
+        const text =
+            document.getElementById('outputResult').innerText;
+
+
+        if (
+            !text ||
+            text.includes(
+                'พิมพ์ข้อความด้านบนแล้วกดปุ่ม'
+            )
+        ) {
+
+            alert('ยังไม่มีโค้ดให้คัดลอก');
+
+            return;
+        }
+
+
+        try {
+
+            if (
+                navigator.clipboard &&
+                window.isSecureContext
+            ) {
+
+                await navigator.clipboard.writeText(text);
+
+            }
+
+            else {
+
+                const textarea =
+                    document.createElement('textarea');
+
+                textarea.value = text;
+
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+
+                document.body.appendChild(textarea);
+
+                textarea.focus();
+                textarea.select();
+
+                document.execCommand('copy');
+
+                textarea.remove();
+
+            }
+
+
+            alert(
+                '✅ คัดลอกซอร์สโค้ดสำเร็จแล้วครับ!'
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                'Clipboard Error:',
+                error
+            );
+
+            alert(
+                '❌ ไม่สามารถคัดลอกอัตโนมัติได้ กรุณาเลือกและคัดลอกโค้ดด้วยตัวเอง'
+            );
+
+        }
+
+    }
+
+
+    // =========================================================
+    // ⌨️ CTRL + ENTER / ENTER SUPPORT
+    // =========================================================
+
+    document
+        .getElementById('promptInput')
+        .addEventListener('keydown', function(event) {
+
+            if (
+                event.ctrlKey &&
+                event.key === 'Enter'
+            ) {
+
+                event.preventDefault();
+
+                processLocalAI();
+
+            }
+
+        });
+
+</script>
+
+</body>
+</html>
